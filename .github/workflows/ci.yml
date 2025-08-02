@@ -1,0 +1,166 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  ENVIRONMENT: dev
+  AZURE_REGION: eastus
+  TERRAFORM_VERSION: '1.6.0'
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_USE_OIDC: true
+
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test Application
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+    
+    - name: Test
+      run: dotnet test --no-build --configuration Release --verbosity normal
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    name: Build and Push Docker Image
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+    
+    - name: Output image URL
+      run: echo "Image pushed to ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Development
+    needs: [test, build-and-push]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    
+    environment:
+      name: development
+      url: ${{ steps.deploy.outputs.app_url }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    
+    - name: Setup Terraform Backend
+      working-directory: terraform
+      run: |
+        terraform init \
+          -backend-config="resource_group_name=${{ secrets.TERRAFORM_STATE_RG }}" \
+          -backend-config="storage_account_name=${{ secrets.TERRAFORM_STATE_SA }}" \
+          -backend-config="container_name=tfstate" \
+          -backend-config="key=${{ env.ENVIRONMENT }}.terraform.tfstate"
+        # Force unlock any existing locks
+        terraform force-unlock -force e5161f17-bc3a-40ec-3113-8f46be6f374a || true
+        
+        # Also try to unlock any other potential locks
+        terraform force-unlock -force $(terraform show -json 2>/dev/null | jq -r '.lock_id // "no-lock"' 2>/dev/null) || true
+    
+    - name: Set ACR variables
+      id: acr
+      run: |
+        ACR_NAME="acrsigvehicular${{ env.ENVIRONMENT }}"
+        ACR_SERVER="$ACR_NAME.azurecr.io"
+        echo "acr_name=$ACR_NAME" >> $GITHUB_OUTPUT
+        echo "acr_server=$ACR_SERVER" >> $GITHUB_OUTPUT
+        echo "Using ACR: $ACR_SERVER"
+    
+    - name: Build and Push Docker Image
+      run: |
+        # Login to ACR (esto creará el ACR si no existe)
+        az acr login --name ${{ steps.acr.outputs.acr_name }}
+        
+        # Build and push image
+        docker build -t ${{ steps.acr.outputs.acr_server }}/transport-management-api:${{ github.sha }} .
+        docker push ${{ steps.acr.outputs.acr_server }}/transport-management-api:${{ github.sha }}
+    
+    - name: Terraform Plan
+      id: plan
+      working-directory: terraform
+      run: |
+        terraform plan \
+          -var-file="environments/${{ env.ENVIRONMENT }}.tfvars" \
+          -var="container_image=${{ steps.acr.outputs.acr_server }}/transport-management-api:${{ github.sha }}" \
+          -var="database_connection_string=${{ secrets.DATABASE_CONNECTION_STRING }}" \
+          -var="jwt_key=${{ secrets.JWT_KEY }}" \
+          -out=tfplan
+    
+    - name: Terraform Apply
+      id: deploy
+      working-directory: terraform
+      run: |
+        terraform apply -auto-approve tfplan
+        echo "app_url=$(terraform output -raw container_app_url)" >> $GITHUB_OUTPUT
