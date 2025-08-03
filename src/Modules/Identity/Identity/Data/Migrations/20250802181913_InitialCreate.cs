@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,8 +10,7 @@ namespace Identity.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(
-                name: "identity");
+            migrationBuilder.EnsureSchema(name: "identity");
 
             migrationBuilder.CreateTable(
                 name: "modulos",
@@ -20,21 +18,59 @@ namespace Identity.Data.Migrations
                 columns: table => new
                 {
                     id_modulo = table.Column<Guid>(type: "uuid", nullable: false),
-                    nombre_modulo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    descripcion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    activo = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    fecha_creacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    creado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_modificacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    modificado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_eliminacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    eliminado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    razon_eliminacion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    nombre_modulo = table.Column<string>(
+                        type: "character varying(50)",
+                        maxLength: 50,
+                        nullable: false
+                    ),
+                    descripcion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: false
+                    ),
+                    activo = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false,
+                        defaultValue: true
+                    ),
+                    fecha_creacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    creado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_modificacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    modificado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_eliminacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    eliminado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    razon_eliminacion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: true
+                    ),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_modulos", x => x.id_modulo);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "roles",
@@ -42,21 +78,59 @@ namespace Identity.Data.Migrations
                 columns: table => new
                 {
                     id_rol = table.Column<Guid>(type: "uuid", nullable: false),
-                    nombre_rol = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    descripcion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    activo = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    fecha_creacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    creado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_modificacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    modificado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_eliminacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    eliminado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    razon_eliminacion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    nombre_rol = table.Column<string>(
+                        type: "character varying(50)",
+                        maxLength: 50,
+                        nullable: false
+                    ),
+                    descripcion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: false
+                    ),
+                    activo = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false,
+                        defaultValue: true
+                    ),
+                    fecha_creacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    creado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_modificacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    modificado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_eliminacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    eliminado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    razon_eliminacion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: true
+                    ),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_roles", x => x.id_rol);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "tipos_permisos",
@@ -64,23 +138,69 @@ namespace Identity.Data.Migrations
                 columns: table => new
                 {
                     id_tipo_permiso = table.Column<Guid>(type: "uuid", nullable: false),
-                    nombre_permiso = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
-                    codigo = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    categoria = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    descripcion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    activo = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    fecha_creacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    creado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_modificacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    modificado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_eliminacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    eliminado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    razon_eliminacion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    nombre_permiso = table.Column<string>(
+                        type: "character varying(30)",
+                        maxLength: 30,
+                        nullable: false
+                    ),
+                    codigo = table.Column<string>(
+                        type: "character varying(20)",
+                        maxLength: 20,
+                        nullable: false
+                    ),
+                    categoria = table.Column<string>(
+                        type: "character varying(20)",
+                        maxLength: 20,
+                        nullable: false
+                    ),
+                    descripcion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: false
+                    ),
+                    activo = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false,
+                        defaultValue: true
+                    ),
+                    fecha_creacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    creado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_modificacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    modificado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_eliminacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    eliminado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    razon_eliminacion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: true
+                    ),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_tipos_permisos", x => x.id_tipo_permiso);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "usuarios",
@@ -88,22 +208,64 @@ namespace Identity.Data.Migrations
                 columns: table => new
                 {
                     id_usuario = table.Column<Guid>(type: "uuid", nullable: false),
-                    nombre = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    password = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    activo = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    fecha_creacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    creado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_modificacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    modificado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_eliminacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    eliminado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    razon_eliminacion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    nombre = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: false
+                    ),
+                    email = table.Column<string>(
+                        type: "character varying(150)",
+                        maxLength: 150,
+                        nullable: false
+                    ),
+                    password = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: false
+                    ),
+                    activo = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false,
+                        defaultValue: true
+                    ),
+                    fecha_creacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    creado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_modificacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    modificado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_eliminacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    eliminado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    razon_eliminacion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: true
+                    ),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_usuarios", x => x.id_usuario);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "permisos",
@@ -114,15 +276,48 @@ namespace Identity.Data.Migrations
                     id_rol = table.Column<Guid>(type: "uuid", nullable: false),
                     id_modulo = table.Column<Guid>(type: "uuid", nullable: false),
                     id_tipo_permiso = table.Column<Guid>(type: "uuid", nullable: false),
-                    fecha_asignacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    activo = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    fecha_creacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    creado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_modificacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    modificado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_eliminacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    eliminado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    razon_eliminacion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    fecha_asignacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false,
+                        defaultValueSql: "CURRENT_TIMESTAMP"
+                    ),
+                    activo = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false,
+                        defaultValue: true
+                    ),
+                    fecha_creacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    creado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_modificacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    modificado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_eliminacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    eliminado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    razon_eliminacion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: true
+                    ),
                 },
                 constraints: table =>
                 {
@@ -133,22 +328,26 @@ namespace Identity.Data.Migrations
                         principalSchema: "identity",
                         principalTable: "modulos",
                         principalColumn: "id_modulo",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_permisos_roles_id_rol",
                         column: x => x.id_rol,
                         principalSchema: "identity",
                         principalTable: "roles",
                         principalColumn: "id_rol",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_permisos_tipos_permisos_id_tipo_permiso",
                         column: x => x.id_tipo_permiso,
                         principalSchema: "identity",
                         principalTable: "tipos_permisos",
                         principalColumn: "id_tipo_permiso",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "refresh_tokens",
@@ -156,26 +355,93 @@ namespace Identity.Data.Migrations
                 columns: table => new
                 {
                     id_refresh_token = table.Column<Guid>(type: "uuid", nullable: false),
-                    token = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    token = table.Column<string>(
+                        type: "character varying(500)",
+                        maxLength: 500,
+                        nullable: false
+                    ),
                     id_usuario = table.Column<Guid>(type: "uuid", nullable: false),
-                    device_id = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    device_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    platform = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    app_version = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    device_id = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: false
+                    ),
+                    device_name = table.Column<string>(
+                        type: "character varying(200)",
+                        maxLength: 200,
+                        nullable: false
+                    ),
+                    platform = table.Column<string>(
+                        type: "character varying(20)",
+                        maxLength: 20,
+                        nullable: false
+                    ),
+                    app_version = table.Column<string>(
+                        type: "character varying(20)",
+                        maxLength: 20,
+                        nullable: true
+                    ),
                     user_agent = table.Column<string>(type: "text", nullable: true),
-                    ip_address = table.Column<string>(type: "character varying(45)", maxLength: 45, nullable: true),
-                    last_used = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    is_revoked = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    revoked_reason = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    activo = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    fecha_creacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    creado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_modificacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    modificado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_eliminacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    eliminado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    razon_eliminacion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    ip_address = table.Column<string>(
+                        type: "character varying(45)",
+                        maxLength: 45,
+                        nullable: true
+                    ),
+                    last_used = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                    expires_at = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                    is_revoked = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false,
+                        defaultValue: false
+                    ),
+                    revoked_reason = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: true
+                    ),
+                    activo = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false,
+                        defaultValue: true
+                    ),
+                    fecha_creacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    creado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_modificacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    modificado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_eliminacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    eliminado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    razon_eliminacion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: true
+                    ),
                 },
                 constraints: table =>
                 {
@@ -186,8 +452,10 @@ namespace Identity.Data.Migrations
                         principalSchema: "identity",
                         principalTable: "usuarios",
                         principalColumn: "id_usuario",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "usuarios_roles",
@@ -197,15 +465,48 @@ namespace Identity.Data.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     id_usuario = table.Column<Guid>(type: "uuid", nullable: false),
                     id_rol = table.Column<Guid>(type: "uuid", nullable: false),
-                    fecha_asignacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    activo = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    fecha_creacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    creado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_modificacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    modificado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    fecha_eliminacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    eliminado_por = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    razon_eliminacion = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    fecha_asignacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false,
+                        defaultValueSql: "CURRENT_TIMESTAMP"
+                    ),
+                    activo = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false,
+                        defaultValue: true
+                    ),
+                    fecha_creacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    creado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_modificacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    modificado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    fecha_eliminacion = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    eliminado_por = table.Column<string>(
+                        type: "character varying(100)",
+                        maxLength: 100,
+                        nullable: true
+                    ),
+                    razon_eliminacion = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: true
+                    ),
                 },
                 constraints: table =>
                 {
@@ -216,256 +517,279 @@ namespace Identity.Data.Migrations
                         principalSchema: "identity",
                         principalTable: "roles",
                         principalColumn: "id_rol",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_usuarios_roles_usuarios_id_usuario",
                         column: x => x.id_usuario,
                         principalSchema: "identity",
                         principalTable: "usuarios",
                         principalColumn: "id_usuario",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_modulos_Activo",
                 schema: "identity",
                 table: "modulos",
-                column: "activo");
+                column: "activo"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_modulos_FechaCreacion",
                 schema: "identity",
                 table: "modulos",
-                column: "fecha_creacion");
+                column: "fecha_creacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_modulos_FechaEliminacion",
                 schema: "identity",
                 table: "modulos",
-                column: "fecha_eliminacion");
+                column: "fecha_eliminacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_permisos_Activo",
                 schema: "identity",
                 table: "permisos",
-                column: "activo");
+                column: "activo"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_permisos_FechaCreacion",
                 schema: "identity",
                 table: "permisos",
-                column: "fecha_creacion");
+                column: "fecha_creacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_permisos_FechaEliminacion",
                 schema: "identity",
                 table: "permisos",
-                column: "fecha_eliminacion");
+                column: "fecha_eliminacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_permisos_id_modulo",
                 schema: "identity",
                 table: "permisos",
-                column: "id_modulo");
+                column: "id_modulo"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_permisos_id_tipo_permiso",
                 schema: "identity",
                 table: "permisos",
-                column: "id_tipo_permiso");
+                column: "id_tipo_permiso"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Permissions_Unique_Active",
                 schema: "identity",
                 table: "permisos",
                 columns: new[] { "id_rol", "id_modulo", "id_tipo_permiso" },
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_refresh_tokens_Activo",
                 schema: "identity",
                 table: "refresh_tokens",
-                column: "activo");
+                column: "activo"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_refresh_tokens_FechaCreacion",
                 schema: "identity",
                 table: "refresh_tokens",
-                column: "fecha_creacion");
+                column: "fecha_creacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_refresh_tokens_FechaEliminacion",
                 schema: "identity",
                 table: "refresh_tokens",
-                column: "fecha_eliminacion");
+                column: "fecha_eliminacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_DeviceId",
                 schema: "identity",
                 table: "refresh_tokens",
-                column: "device_id");
+                column: "device_id"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_ExpiresAt",
                 schema: "identity",
                 table: "refresh_tokens",
-                column: "expires_at");
+                column: "expires_at"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_Platform",
                 schema: "identity",
                 table: "refresh_tokens",
-                column: "platform");
+                column: "platform"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_Token",
                 schema: "identity",
                 table: "refresh_tokens",
                 column: "token",
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
                 schema: "identity",
                 table: "refresh_tokens",
-                column: "id_usuario");
+                column: "id_usuario"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId_DeviceId",
                 schema: "identity",
                 table: "refresh_tokens",
-                columns: new[] { "id_usuario", "device_id" });
+                columns: new[] { "id_usuario", "device_id" }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_roles_Activo",
                 schema: "identity",
                 table: "roles",
-                column: "activo");
+                column: "activo"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_roles_FechaCreacion",
                 schema: "identity",
                 table: "roles",
-                column: "fecha_creacion");
+                column: "fecha_creacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_roles_FechaEliminacion",
                 schema: "identity",
                 table: "roles",
-                column: "fecha_eliminacion");
+                column: "fecha_eliminacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_tipos_permisos_Activo",
                 schema: "identity",
                 table: "tipos_permisos",
-                column: "activo");
+                column: "activo"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_tipos_permisos_codigo",
                 schema: "identity",
                 table: "tipos_permisos",
                 column: "codigo",
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_tipos_permisos_FechaCreacion",
                 schema: "identity",
                 table: "tipos_permisos",
-                column: "fecha_creacion");
+                column: "fecha_creacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_tipos_permisos_FechaEliminacion",
                 schema: "identity",
                 table: "tipos_permisos",
-                column: "fecha_eliminacion");
+                column: "fecha_eliminacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuarios_Activo",
                 schema: "identity",
                 table: "usuarios",
-                column: "activo");
+                column: "activo"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuarios_email",
                 schema: "identity",
                 table: "usuarios",
                 column: "email",
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuarios_FechaCreacion",
                 schema: "identity",
                 table: "usuarios",
-                column: "fecha_creacion");
+                column: "fecha_creacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuarios_FechaEliminacion",
                 schema: "identity",
                 table: "usuarios",
-                column: "fecha_eliminacion");
+                column: "fecha_eliminacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuarios_roles_Activo",
                 schema: "identity",
                 table: "usuarios_roles",
-                column: "activo");
+                column: "activo"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuarios_roles_FechaCreacion",
                 schema: "identity",
                 table: "usuarios_roles",
-                column: "fecha_creacion");
+                column: "fecha_creacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuarios_roles_FechaEliminacion",
                 schema: "identity",
                 table: "usuarios_roles",
-                column: "fecha_eliminacion");
+                column: "fecha_eliminacion"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuarios_roles_id_rol",
                 schema: "identity",
                 table: "usuarios_roles",
-                column: "id_rol");
+                column: "id_rol"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuarios_roles_id_usuario_id_rol",
                 schema: "identity",
                 table: "usuarios_roles",
                 columns: new[] { "id_usuario", "id_rol" },
-                unique: true);
+                unique: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "permisos",
-                schema: "identity");
+            migrationBuilder.DropTable(name: "permisos", schema: "identity");
 
-            migrationBuilder.DropTable(
-                name: "refresh_tokens",
-                schema: "identity");
+            migrationBuilder.DropTable(name: "refresh_tokens", schema: "identity");
 
-            migrationBuilder.DropTable(
-                name: "usuarios_roles",
-                schema: "identity");
+            migrationBuilder.DropTable(name: "usuarios_roles", schema: "identity");
 
-            migrationBuilder.DropTable(
-                name: "modulos",
-                schema: "identity");
+            migrationBuilder.DropTable(name: "modulos", schema: "identity");
 
-            migrationBuilder.DropTable(
-                name: "tipos_permisos",
-                schema: "identity");
+            migrationBuilder.DropTable(name: "tipos_permisos", schema: "identity");
 
-            migrationBuilder.DropTable(
-                name: "roles",
-                schema: "identity");
+            migrationBuilder.DropTable(name: "roles", schema: "identity");
 
-            migrationBuilder.DropTable(
-                name: "usuarios",
-                schema: "identity");
+            migrationBuilder.DropTable(name: "usuarios", schema: "identity");
         }
     }
 }

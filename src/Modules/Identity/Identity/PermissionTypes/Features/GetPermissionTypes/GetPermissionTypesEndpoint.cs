@@ -1,6 +1,6 @@
 using Identity.Permissions.Dtos;
 
-namespace Identity.Permissions.Features.GetPermissionTypes;
+namespace Identity.PermissionTypes.Features.GetPermissionTypes;
 
 public record GetPermissionTypesResponse(List<PermissionTypeDto> PermissionTypes);
 
@@ -18,7 +18,7 @@ public class GetPermissionTypesEndpoint : ICarterModule
                     return Results.Ok(response);
                 }
             )
-            .WithTags("Permissions")
+            .WithTags("PermissionTypes")
             .WithName("GetPermissionTypes")
             .Produces<GetPermissionTypesResponse>(StatusCodes.Status200OK)
             .WithSummary("Get Permission Types")

@@ -1,5 +1,4 @@
 using Shared.Data.Configurations;
-using Module = Identity.Modules.Models.Module;
 
 namespace Identity.Data.Configurations;
 

@@ -6,7 +6,7 @@ public record GetUsersQuery(PaginationRequest PaginationRequest) : IQuery<GetUse
 
 public record GetUsersResult(PaginatedResult<UserDto> Users);
 
-internal class GetUsersHandler(IdentityDbContext dbContext)
+internal class GetUsersHandler(IUnitOfWork unitOfWork)
     : IQueryHandler<GetUsersQuery, GetUsersResult>
 {
     public async Task<GetUsersResult> HandleAsync(
@@ -14,15 +14,17 @@ internal class GetUsersHandler(IdentityDbContext dbContext)
         CancellationToken cancellationToken
     )
     {
+        var userRepository = unitOfWork.Repository<User>();
+
         var pageIndex = query.PaginationRequest.PageIndex;
         var pageSize = query.PaginationRequest.PageSize;
 
-        var totalCount = await dbContext.Users.LongCountAsync(cancellationToken);
+        var totalCount = await userRepository.CountAsync(cancellationToken: cancellationToken);
 
-        var users = await dbContext
-            .Users.Include(u => u.UserRoles)
+        var users = await userRepository
+            .Query(asNoTracking: true)
+            .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
-            .AsNoTracking()
             .OrderBy(u => u.Name)
             .Skip(pageSize * pageIndex)
             .Take(pageSize)

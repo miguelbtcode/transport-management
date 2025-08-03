@@ -17,7 +17,7 @@ public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCo
     }
 }
 
-internal class ChangePasswordHandler(IdentityDbContext dbContext, IPasswordHasher passwordHasher)
+internal class ChangePasswordHandler(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
     : ICommandHandler<ChangePasswordCommand, Result<ChangePasswordResult>>
 {
     public async Task<Result<ChangePasswordResult>> HandleAsync(
@@ -25,8 +25,11 @@ internal class ChangePasswordHandler(IdentityDbContext dbContext, IPasswordHashe
         CancellationToken cancellationToken
     )
     {
-        var user = await dbContext.Users.FirstOrDefaultAsync(
+        var userRepository = unitOfWork.Repository<User>();
+
+        var user = await userRepository.FirstOrDefaultAsync(
             u => u.Id == command.UserId,
+            asNoTracking: false, // Necesitamos tracking para modificar
             cancellationToken
         );
 
@@ -41,7 +44,7 @@ internal class ChangePasswordHandler(IdentityDbContext dbContext, IPasswordHashe
         var newHashedPassword = passwordHasher.HashPassword(command.NewPassword);
         user.ChangePassword(newHashedPassword);
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return new ChangePasswordResult(true);
     }
 }

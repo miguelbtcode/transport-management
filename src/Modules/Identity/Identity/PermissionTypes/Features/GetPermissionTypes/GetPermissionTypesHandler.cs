@@ -1,12 +1,13 @@
 using Identity.Permissions.Dtos;
+using Identity.PermissionTypes.Models;
 
-namespace Identity.Permissions.Features.GetPermissionTypes;
+namespace Identity.PermissionTypes.Features.GetPermissionTypes;
 
 public record GetPermissionTypesQuery() : IQuery<GetPermissionTypesResult>;
 
 public record GetPermissionTypesResult(List<PermissionTypeDto> PermissionTypes);
 
-internal class GetPermissionTypesHandler(IdentityDbContext dbContext)
+internal class GetPermissionTypesHandler(IUnitOfWork unitOfWork)
     : IQueryHandler<GetPermissionTypesQuery, GetPermissionTypesResult>
 {
     public async Task<GetPermissionTypesResult> HandleAsync(
@@ -14,8 +15,10 @@ internal class GetPermissionTypesHandler(IdentityDbContext dbContext)
         CancellationToken cancellationToken
     )
     {
-        var permissionTypes = await dbContext
-            .PermissionTypes.AsNoTracking()
+        var permissionTypeRepository = unitOfWork.Repository<PermissionType>();
+
+        var permissionTypes = await permissionTypeRepository
+            .Query(asNoTracking: true)
             .OrderBy(pt => pt.Category)
             .ThenBy(pt => pt.Name)
             .Select(pt => new PermissionTypeDto(

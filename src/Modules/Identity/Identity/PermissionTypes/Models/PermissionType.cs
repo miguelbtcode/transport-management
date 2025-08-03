@@ -1,4 +1,4 @@
-namespace Identity.Permissions.Models;
+namespace Identity.PermissionTypes.Models;
 
 public class PermissionType : Entity<Guid>
 {

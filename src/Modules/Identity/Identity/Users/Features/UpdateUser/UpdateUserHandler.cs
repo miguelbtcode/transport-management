@@ -17,7 +17,7 @@ public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
     }
 }
 
-internal class UpdateUserHandler(IdentityDbContext dbContext)
+internal class UpdateUserHandler(IUnitOfWork unitOfWork)
     : ICommandHandler<UpdateUserCommand, Result<UpdateUserResult>>
 {
     public async Task<Result<UpdateUserResult>> HandleAsync(
@@ -27,16 +27,21 @@ internal class UpdateUserHandler(IdentityDbContext dbContext)
     {
         try
         {
-            var user = await dbContext
-                .Users.Include(u => u.UserRoles)
-                .FirstOrDefaultAsync(u => u.Id == command.UserDto.Id, cancellationToken);
+            var userRepository = unitOfWork.Repository<User>();
+            var roleRepository = unitOfWork.Repository<Role>();
+
+            var user = await userRepository
+                .Query(u => u.Id == command.UserDto.Id, asNoTracking: false)
+                .Include(u => u.UserRoles)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (user == null)
                 return UserErrors.NotFound(command.UserDto.Id);
 
             // Verificar si el email ya existe en otro usuario
-            var existingUser = await dbContext.Users.FirstOrDefaultAsync(
+            var existingUser = await userRepository.FirstOrDefaultAsync(
                 u => u.Email == command.UserDto.Email.ToLower() && u.Id != command.UserDto.Id,
+                asNoTracking: true,
                 cancellationToken
             );
 
@@ -44,9 +49,10 @@ internal class UpdateUserHandler(IdentityDbContext dbContext)
                 return UserErrors.EmailAlreadyExists(command.UserDto.Email);
 
             // Verificar que los roles existen
-            var existingRoles = await dbContext
-                .Roles.Where(r => command.UserDto.RoleIds.Contains(r.Id) && r.Enabled)
-                .CountAsync(cancellationToken);
+            var existingRoles = await roleRepository.CountAsync(
+                r => command.UserDto.RoleIds.Contains(r.Id) && r.Enabled,
+                cancellationToken
+            );
 
             if (existingRoles != command.UserDto.RoleIds.Count)
                 return RoleErrors.InvalidRoles;
@@ -58,8 +64,7 @@ internal class UpdateUserHandler(IdentityDbContext dbContext)
                 command.UserDto.RoleIds
             );
 
-            // SaveChanges maneja automáticamente las transacciones
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return new UpdateUserResult(true);
         }
         catch (DbUpdateConcurrencyException)

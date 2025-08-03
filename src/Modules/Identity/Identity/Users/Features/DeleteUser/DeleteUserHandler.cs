@@ -12,7 +12,7 @@ public class DeleteUserCommandValidator : AbstractValidator<DeleteUserCommand>
     }
 }
 
-internal class DeleteUserHandler(IdentityDbContext dbContext)
+internal class DeleteUserHandler(IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteUserCommand, Result<DeleteUserResult>>
 {
     public async Task<Result<DeleteUserResult>> HandleAsync(
@@ -20,8 +20,11 @@ internal class DeleteUserHandler(IdentityDbContext dbContext)
         CancellationToken cancellationToken
     )
     {
-        var usuario = await dbContext.Users.FirstOrDefaultAsync(
+        var userRepository = unitOfWork.Repository<User>();
+
+        var usuario = await userRepository.FirstOrDefaultAsync(
             u => u.Id == command.UserId,
+            asNoTracking: false,
             cancellationToken
         );
 
@@ -31,10 +34,7 @@ internal class DeleteUserHandler(IdentityDbContext dbContext)
         // Soft delete - desactivar usuario
         usuario.Deactivate();
 
-        // Agregar evento de dominio
-        usuario.AddDomainEvent(new UserDeletedEvent(command.UserId));
-
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return new DeleteUserResult(true);
     }
 }

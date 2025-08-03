@@ -17,7 +17,7 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     }
 }
 
-internal class CreateUserHandler(IdentityDbContext dbContext, IPasswordHasher passwordHasher)
+internal class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
     : ICommandHandler<CreateUserCommand, Result<CreateUserResult>>
 {
     public async Task<Result<CreateUserResult>> HandleAsync(
@@ -25,28 +25,43 @@ internal class CreateUserHandler(IdentityDbContext dbContext, IPasswordHasher pa
         CancellationToken cancellationToken = default
     )
     {
-        // Verificar si el email ya existe
-        var existingUser = await dbContext.Users.FirstOrDefaultAsync(
+        var userRepository = unitOfWork.Repository<User>();
+
+        // Verificar si el email ya existe (solo lectura)
+        var existingUser = await userRepository.FirstOrDefaultAsync(
             u => u.Email == command.User.Email.ToLower(),
+            asNoTracking: true,
             cancellationToken
         );
 
         if (existingUser != null)
             return UserErrors.EmailAlreadyExists(command.User.Email);
 
-        // Crear usuario
-        var hashedPassword = passwordHasher.HashPassword(command.User.Password);
-        var usuario = User.Create(command.User.Name, command.User.Email, hashedPassword);
+        // Ejecutar en transacción
+        var userId = await unitOfWork.ExecuteInTransactionAsync(
+            async () =>
+            {
+                // Crear usuario
+                var hashedPassword = passwordHasher.HashPassword(command.User.Password);
+                var usuario = User.Create(
+                    command.User.Name,
+                    command.User.Email,
+                    hashedPassword,
+                    command.User.Enabled
+                );
 
-        // Asignar roles
-        foreach (var roleId in command.User.RoleIds)
-        {
-            usuario.AssignRole(roleId);
-        }
+                // Asignar roles
+                foreach (var roleId in command.User.RoleIds)
+                {
+                    usuario.AssignRole(roleId);
+                }
 
-        dbContext.Users.Add(usuario);
-        await dbContext.SaveChangesAsync(cancellationToken);
+                await userRepository.AddAsync(usuario, cancellationToken);
+                return usuario.Id;
+            },
+            cancellationToken
+        );
 
-        return new CreateUserResult(usuario.Id);
+        return new CreateUserResult(userId);
     }
 }

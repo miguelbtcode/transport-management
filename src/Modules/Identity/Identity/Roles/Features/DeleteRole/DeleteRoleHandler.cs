@@ -1,5 +1,3 @@
-using Shared.Data.UnitOfWork;
-
 namespace Identity.Roles.Features.DeleteRole;
 
 public record DeleteRoleCommand(Guid RoleId) : ICommand<Result<DeleteRoleResult>>;
@@ -14,28 +12,31 @@ public class DeleteRoleCommandValidator : AbstractValidator<DeleteRoleCommand>
     }
 }
 
-internal class DeleteRoleHandler(
-    IdentityDbContext dbContext,
-    IUnitOfWork unitOfWork,
-    ILogger<DeleteRoleHandler> logger
-) : ICommandHandler<DeleteRoleCommand, Result<DeleteRoleResult>>
+internal class DeleteRoleHandler(IUnitOfWork unitOfWork, ILogger<DeleteRoleHandler> logger)
+    : ICommandHandler<DeleteRoleCommand, Result<DeleteRoleResult>>
 {
     public async Task<Result<DeleteRoleResult>> HandleAsync(
         DeleteRoleCommand command,
         CancellationToken cancellationToken
     )
     {
-        // 1. Verificar que el rol existe Y está activo
-        var role = await dbContext.Roles.FirstOrDefaultAsync(
+        // 1. Get repositories
+        var roleRepository = unitOfWork.Repository<Role>();
+        var userRoleRepository = unitOfWork.Repository<UserRole>();
+        var permissionRepository = unitOfWork.Repository<Permission>();
+
+        // 2. Verificar que el rol existe y está activo
+        var role = await roleRepository.FirstOrDefaultAsync(
             r => r.Id == command.RoleId && r.Enabled,
+            asNoTracking: false,
             cancellationToken
         );
 
         if (role == null)
             return RoleErrors.NotFound(command.RoleId);
 
-        // 2. Verificar si el rol tiene usuarios asignados
-        var hasAssignedUsers = await dbContext.UserRoles.AnyAsync(
+        // 3. Verificar si el rol tiene usuarios asignados
+        var hasAssignedUsers = await userRoleRepository.AnyAsync(
             ur => ur.IdRole == command.RoleId,
             cancellationToken
         );
@@ -48,15 +49,17 @@ internal class DeleteRoleHandler(
             );
         }
 
-        // 3. Usar la estrategia de ejecución de EF para manejar reintentos
         try
         {
+            // 4. Ejecutar operación en transacción
             await unitOfWork.ExecuteInTransactionAsync(
                 async () =>
                 {
-                    var activePermissions = await dbContext
-                        .Permissions.Where(p => p.IdRole == command.RoleId && p.Enabled)
-                        .ToListAsync(cancellationToken);
+                    var activePermissions = await permissionRepository.GetAsync(
+                        p => p.IdRole == command.RoleId && p.Enabled,
+                        asNoTracking: false,
+                        cancellationToken
+                    );
 
                     foreach (var permission in activePermissions)
                         permission.DeactivateByRoleDeletion();
@@ -66,7 +69,7 @@ internal class DeleteRoleHandler(
                     logger.LogInformation(
                         "Rol {RoleId} desactivado con {Count} permisos",
                         command.RoleId,
-                        activePermissions.Count
+                        activePermissions.Count()
                     );
                 },
                 cancellationToken

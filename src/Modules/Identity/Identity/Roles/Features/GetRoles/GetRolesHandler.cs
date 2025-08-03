@@ -30,7 +30,7 @@ public record RoleDetailDto(
     List<ModuleWithPermissionsDto> ModulesWithPermissions
 );
 
-internal class GetRolesHandler(IdentityDbContext dbContext)
+internal class GetRolesHandler(IUnitOfWork unitOfWork)
     : IQueryHandler<GetRolesQuery, GetRolesResult>
 {
     public async Task<GetRolesResult> HandleAsync(
@@ -38,28 +38,34 @@ internal class GetRolesHandler(IdentityDbContext dbContext)
         CancellationToken cancellationToken
     )
     {
-        // 1. Get total roles
-        var totalRoles = await dbContext.Roles.CountAsync(r => r.Enabled, cancellationToken);
+        // 1. Get repositories
+        var roleRepository = unitOfWork.Repository<Role>();
+        var userRoleRepository = unitOfWork.Repository<UserRole>();
+        var moduleRepository = unitOfWork.Repository<Module>();
+        var permissionRepository = unitOfWork.Repository<Permission>();
 
-        // 2. Get total assigned users
-        var totalAssignedUsers = await dbContext
-            .UserRoles.Where(ur => ur.Role.Enabled)
+        // 2. Get total roles
+        var totalRoles = await roleRepository.CountAsync(r => r.Enabled, cancellationToken);
+
+        // 3. Get total assigned users
+        var totalAssignedUsers = await userRoleRepository
+            .Query(ur => ur.Role.Enabled, asNoTracking: true)
             .Select(ur => ur.IdUser)
             .Distinct()
             .CountAsync(cancellationToken);
 
-        // 3. Get total available modules
-        var totalAvailableModules = await dbContext.Modules.CountAsync(
-            r => r.Enabled,
+        // 4. Get total available modules
+        var totalAvailableModules = await moduleRepository.CountAsync(
+            m => m.Enabled,
             cancellationToken
         );
 
-        // 4. Get total permissions
-        var totalPermissions = await dbContext
-            .Permissions.Where(p => p.Role.Enabled)
+        // 5. Get total permissions
+        var totalPermissions = await permissionRepository
+            .Query(p => p.Role.Enabled, asNoTracking: true)
             .CountAsync(cancellationToken);
 
-        // 5. Create the statistics object
+        // 6. Create the statistics object
         var statistics = new RoleStatistics(
             totalRoles,
             totalAssignedUsers,
@@ -67,10 +73,9 @@ internal class GetRolesHandler(IdentityDbContext dbContext)
             totalPermissions
         );
 
-        // 6. Get roles with details
-        var rolesData = await dbContext
-            .Roles.AsNoTracking()
-            .Where(r => r.Enabled)
+        // 7. Get roles with details
+        var rolesData = await roleRepository
+            .Query(r => r.Enabled, asNoTracking: true)
             .Include(r => r.UserRoles)
             .Include(r => r.Permissions)
             .ThenInclude(p => p.Module)
@@ -79,14 +84,14 @@ internal class GetRolesHandler(IdentityDbContext dbContext)
             .OrderBy(r => r.Name)
             .ToListAsync(cancellationToken);
 
-        // 7. Build the role details response
+        // 8. Build the role details response
         var roleDetails = rolesData
             .Select(role =>
             {
-                // 7.1. Get assigned users count
+                // 8.1. Get assigned users count
                 var assignedUsersCount = role.UserRoles.Count;
 
-                // 7.2. Get module count available
+                // 8.2. Get module count available
                 var modulePermissions = role
                     .Permissions.Where(p => p.Module.Enabled)
                     .GroupBy(p => p.Module)

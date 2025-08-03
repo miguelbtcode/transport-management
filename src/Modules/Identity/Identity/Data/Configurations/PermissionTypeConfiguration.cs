@@ -1,3 +1,4 @@
+using Identity.PermissionTypes.Models;
 using Shared.Data.Configurations;
 
 namespace Identity.Data.Configurations;

@@ -1,3 +1,4 @@
+using Identity.PermissionTypes.Models;
 using Identity.Roles.Dtos;
 
 namespace Identity.Roles.Features.UpdateRole;
@@ -30,7 +31,7 @@ public class UpdateRoleCommandValidator : AbstractValidator<UpdateRoleCommand>
     }
 }
 
-internal class UpdateRoleHandler(IdentityDbContext dbContext)
+internal class UpdateRoleHandler(IUnitOfWork unitOfWork)
     : ICommandHandler<UpdateRoleCommand, Result<UpdateRoleResult>>
 {
     public async Task<Result<UpdateRoleResult>> HandleAsync(
@@ -38,32 +39,40 @@ internal class UpdateRoleHandler(IdentityDbContext dbContext)
         CancellationToken cancellationToken
     )
     {
-        // 1. Verificar que el rol existe
-        var role = await dbContext.Roles.FirstOrDefaultAsync(
+        // 1. Get repositories
+        var roleRepository = unitOfWork.Repository<Role>();
+        var moduleRepository = unitOfWork.Repository<Module>();
+        var permissionTypeRepository = unitOfWork.Repository<PermissionType>();
+        var permissionRepository = unitOfWork.Repository<Permission>();
+
+        // 2. Verificar que el rol existe (tracking = true para modificar)
+        var role = await roleRepository.FirstOrDefaultAsync(
             r => r.Id == command.RoleId && r.Enabled,
+            asNoTracking: false,
             cancellationToken
         );
 
         if (role == null)
             return RoleErrors.NotFound(command.RoleId);
 
-        // 2. Verificar si el nombre ya existe en otro rol
-        var existingRoleWithName = await dbContext.Roles.FirstOrDefaultAsync(
+        // 3. Verificar si el nombre ya existe en otro rol (solo lectura)
+        var existingRoleWithName = await roleRepository.FirstOrDefaultAsync(
             r => r.Name.ToLower() == command.Role.Name.ToLower() && r.Id != command.RoleId,
+            asNoTracking: true,
             cancellationToken
         );
 
         if (existingRoleWithName != null)
             return RoleErrors.NameAlreadyExists(command.Role.Name);
 
-        // 3. Verificar que todos los módulos existen y están activos
+        // 4. Verificar que todos los módulos existen y están activos (solo lectura)
         var moduleIds = command.Role.Permissions.Select(p => p.ModuleId).Distinct().ToList();
-        var existingModules = await dbContext
-            .Modules.Where(m => moduleIds.Contains(m.Id) && m.Enabled)
+        var existingModuleIds = await moduleRepository
+            .Query(m => moduleIds.Contains(m.Id) && m.Enabled, asNoTracking: true)
             .Select(m => m.Id)
             .ToListAsync(cancellationToken);
 
-        if (existingModules.Count != moduleIds.Count)
+        if (existingModuleIds.Count != moduleIds.Count)
         {
             return new Error(
                 "Role.InvalidModules",
@@ -71,17 +80,17 @@ internal class UpdateRoleHandler(IdentityDbContext dbContext)
             );
         }
 
-        // 4. Verificar que todos los tipos de permiso existen
+        // 5. Verificar que todos los tipos de permiso existen (solo lectura)
         var permissionTypeIds = command
             .Role.Permissions.Select(p => p.PermissionTypeId)
             .Distinct()
             .ToList();
-        var existingPermissionTypes = await dbContext
-            .PermissionTypes.Where(pt => permissionTypeIds.Contains(pt.Id))
+        var existingPermissionTypeIds = await permissionTypeRepository
+            .Query(pt => permissionTypeIds.Contains(pt.Id), asNoTracking: true)
             .Select(pt => pt.Id)
             .ToListAsync(cancellationToken);
 
-        if (existingPermissionTypes.Count != permissionTypeIds.Count)
+        if (existingPermissionTypeIds.Count != permissionTypeIds.Count)
         {
             return new Error(
                 "Role.InvalidPermissionTypes",
@@ -89,33 +98,39 @@ internal class UpdateRoleHandler(IdentityDbContext dbContext)
             );
         }
 
-        // 5. Actualizar información básica del rol
-        role.Update(command.Role.Name, command.Role.Description);
+        // 6. Execute in transaction
+        await unitOfWork.ExecuteInTransactionAsync(
+            async () =>
+            {
+                // Actualizar información básica del rol (tracked entity)
+                role.Update(command.Role.Name, command.Role.Description);
 
-        // Eliminar todos los permisos existentes del rol
-        var existingPermissions = await dbContext
-            .Permissions.Where(p => p.IdRole == command.RoleId)
-            .ToListAsync(cancellationToken);
+                // Eliminar todos los permisos existentes del rol (tracking = true para eliminar)
+                var existingPermissions = await permissionRepository.GetAsync(
+                    p => p.IdRole == command.RoleId,
+                    asNoTracking: false,
+                    cancellationToken
+                );
 
-        if (existingPermissions.Count != 0)
-        {
-            dbContext.Permissions.RemoveRange(existingPermissions);
-        }
+                if (existingPermissions.Any())
+                {
+                    permissionRepository.RemoveRange(existingPermissions);
+                }
 
-        // Crear los nuevos permisos
-        var newPermissions = command
-            .Role.Permissions.Select(p =>
-                Permission.Create(command.RoleId, p.ModuleId, p.PermissionTypeId)
-            )
-            .ToList();
+                // Crear los nuevos permisos
+                var newPermissions = command
+                    .Role.Permissions.Select(p =>
+                        Permission.Create(command.RoleId, p.ModuleId, p.PermissionTypeId)
+                    )
+                    .ToList();
 
-        if (newPermissions.Count != 0)
-        {
-            dbContext.Permissions.AddRange(newPermissions);
-        }
-
-        // Guardar todos los cambios
-        await dbContext.SaveChangesAsync(cancellationToken);
+                if (newPermissions.Any())
+                {
+                    await permissionRepository.AddRangeAsync(newPermissions, cancellationToken);
+                }
+            },
+            cancellationToken
+        );
 
         return new UpdateRoleResult(true);
     }

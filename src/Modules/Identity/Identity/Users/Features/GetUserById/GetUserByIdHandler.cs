@@ -4,7 +4,7 @@ public record GetUserByIdQuery(Guid Id) : IQuery<Result<GetUserByIdResult>>;
 
 public record GetUserByIdResult(UserDto UserDto);
 
-internal class GetUserByIdHandler(IdentityDbContext dbContext)
+internal class GetUserByIdHandler(IUnitOfWork unitOfWork)
     : IQueryHandler<GetUserByIdQuery, Result<GetUserByIdResult>>
 {
     public async Task<Result<GetUserByIdResult>> HandleAsync(
@@ -12,11 +12,13 @@ internal class GetUserByIdHandler(IdentityDbContext dbContext)
         CancellationToken cancellationToken
     )
     {
-        var user = await dbContext
-            .Users.Include(u => u.UserRoles)
+        var userRepository = unitOfWork.Repository<User>();
+
+        var user = await userRepository
+            .Query(u => u.Id == query.Id, asNoTracking: true)
+            .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == query.Id, cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (user == null)
             return UserErrors.NotFound(query.Id);

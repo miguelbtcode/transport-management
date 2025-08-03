@@ -11,7 +11,7 @@ public class User : Aggregate<Guid>
 
     private User() { }
 
-    public static User Create(string name, string email, string hashedPassword)
+    public static User Create(string name, string email, string hashedPassword, bool enabled = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(email);
@@ -23,7 +23,7 @@ public class User : Aggregate<Guid>
             Name = name,
             Email = email.ToLower(),
             Password = hashedPassword,
-            Enabled = true,
+            Enabled = enabled,
         };
 
         user.AddDomainEvent(new UserCreatedEvent(user));

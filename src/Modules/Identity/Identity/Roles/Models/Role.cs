@@ -35,5 +35,10 @@ public class Role : Aggregate<Guid>
 
     public void Activate() => Enabled = true;
 
-    public void Deactivate() => Enabled = false;
+    public void Deactivate()
+    {
+        Enabled = false;
+        DeletedAt = DateTime.UtcNow;
+        DeletedReason = "Role deleted";
+    }
 }

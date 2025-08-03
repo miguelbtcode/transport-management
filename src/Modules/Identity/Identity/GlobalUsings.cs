@@ -18,5 +18,7 @@ global using Microsoft.Extensions.Logging;
 global using Shared.Contracts.CQRS;
 global using Shared.Contracts.DDD;
 global using Shared.Data.Seed;
+global using Shared.Data.UnitOfWork;
 global using Shared.DDD;
 global using Shared.Results;
+global using Module = Identity.Modules.Models.Module;

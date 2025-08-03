@@ -1,4 +1,4 @@
-using Module = Identity.Modules.Models.Module;
+using Identity.PermissionTypes.Models;
 
 namespace Identity.Permissions.Models;
 
@@ -16,7 +16,12 @@ public class Permission : Entity<Guid>
 
     private Permission() { }
 
-    public static Permission Create(Guid idRole, Guid idModule, Guid idPermissionType)
+    public static Permission Create(
+        Guid idRole,
+        Guid idModule,
+        Guid idPermissionType,
+        bool enabled = true
+    )
     {
         return new Permission
         {
@@ -25,8 +30,16 @@ public class Permission : Entity<Guid>
             IdModule = idModule,
             IdPermissionType = idPermissionType,
             DateAssigned = DateTime.UtcNow,
-            Enabled = true,
+            Enabled = enabled,
         };
+    }
+
+    public void Update(Guid idRole, Guid idModule, Guid idPermissionType)
+    {
+        IdRole = idRole;
+        IdModule = idModule;
+        IdPermissionType = idPermissionType;
+        DateAssigned = DateTime.UtcNow;
     }
 
     public void Activate()

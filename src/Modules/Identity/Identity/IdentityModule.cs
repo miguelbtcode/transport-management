@@ -73,8 +73,8 @@ public static class IdentityModule
 
         services.AddScoped<IDataSeeder, IdentityDataSeeder>();
 
-        // UnitOfWork
-        services.AddUnitOfWork<IdentityDbContext>();
+        // Repository Pattern
+        services.AddRepositoryPattern<IdentityDbContext>();
     }
 
     private static void AddAuthenticationServices(

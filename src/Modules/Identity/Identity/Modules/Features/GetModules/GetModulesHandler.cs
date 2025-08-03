@@ -6,7 +6,7 @@ public record GetModulesQuery() : IQuery<GetModulesResult>;
 
 public record GetModulesResult(List<ModuleDto> Modules);
 
-internal class GetModulesHandler(IdentityDbContext dbContext)
+internal class GetModulesHandler(IUnitOfWork unitOfWork)
     : IQueryHandler<GetModulesQuery, GetModulesResult>
 {
     public async Task<GetModulesResult> HandleAsync(
@@ -14,9 +14,10 @@ internal class GetModulesHandler(IdentityDbContext dbContext)
         CancellationToken cancellationToken
     )
     {
-        var modules = await dbContext
-            .Modules.AsNoTracking()
-            .Where(m => m.Enabled)
+        var moduleRepository = unitOfWork.Repository<Module>();
+
+        var modules = await moduleRepository
+            .Query(m => m.Enabled, asNoTracking: true)
             .OrderBy(m => m.Name)
             .Select(m => new ModuleDto(m.Id, m.Name, m.Description, m.Enabled))
             .ToListAsync(cancellationToken);

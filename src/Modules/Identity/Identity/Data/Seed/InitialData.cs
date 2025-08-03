@@ -1,4 +1,4 @@
-using Module = Identity.Modules.Models.Module;
+using Identity.PermissionTypes.Models;
 
 namespace Identity.Data.Seed;
 
