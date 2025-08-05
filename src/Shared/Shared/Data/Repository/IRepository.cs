@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace Shared.Data.Repository;
 
 public interface IRepository<TEntity>

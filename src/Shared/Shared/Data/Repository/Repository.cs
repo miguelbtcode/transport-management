@@ -1,3 +1,6 @@
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+
 namespace Shared.Data.Repository;
 
 public class Repository<TEntity> : IRepository<TEntity>
