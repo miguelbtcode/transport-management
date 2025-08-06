@@ -1,23 +1,54 @@
-using Shared.Data.Configurations;
-
 namespace Identity.Data.Configurations;
 
-public class PermissionConfiguration : SpanishEntityConfiguration<Permission, Guid>
+public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 {
-    protected override void ConfigureEntity(EntityTypeBuilder<Permission> builder)
+    public void Configure(EntityTypeBuilder<Permission> builder)
     {
-        // Override primary key column name
-        builder.Property(e => e.Id).HasColumnName("id_permiso");
+        // Pk
+        builder.HasKey(e => e.Id);
+        builder.ToTable("permissions");
 
-        // Entity-specific properties
-        builder.Property(e => e.IdRole).IsRequired().HasColumnName("id_rol");
-        builder.Property(e => e.IdModule).IsRequired().HasColumnName("id_modulo");
-        builder.Property(e => e.IdPermissionType).IsRequired().HasColumnName("id_tipo_permiso");
+        // Properties
+        builder.Property(e => e.IdRole).IsRequired().HasColumnName("role_id");
+        builder.Property(e => e.IdModule).IsRequired().HasColumnName("module_id");
+        builder.Property(e => e.IdPermissionType).IsRequired().HasColumnName("permission_type_id");
         builder
             .Property(e => e.DateAssigned)
             .IsRequired()
-            .HasColumnName("fecha_asignacion")
+            .HasColumnName("assigned_date")
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        // Soft delete
+        builder
+            .Property(e => e.Enabled)
+            .IsRequired()
+            .HasColumnName("enabled")
+            .HasDefaultValue(true);
+
+        // Audit fields properties
+        builder.Property(e => e.CreatedAt).HasColumnName("created_at");
+        builder.Property(e => e.LastModified).HasColumnName("last_modified");
+        builder.Property(e => e.CreatedBy).HasMaxLength(100).HasColumnName("created_by");
+        builder.Property(e => e.LastModifiedBy).HasMaxLength(100).HasColumnName("last_modified_by");
+        builder.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+        builder.Property(e => e.DeletedBy).HasMaxLength(100).HasColumnName("deleted_by");
+        builder.Property(e => e.DeletedReason).HasMaxLength(255).HasColumnName("deleted_reason");
+
+        // Properties indexes
+        builder
+            .HasIndex(p => new
+            {
+                p.IdRole,
+                p.IdModule,
+                p.IdPermissionType,
+            })
+            .IsUnique()
+            .HasDatabaseName("IX_Permissions_Unique_Active");
+
+        // Audit indexes
+        builder.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_permissions_CreatedAt");
+        builder.HasIndex(e => e.DeletedAt).HasDatabaseName("IX_permissions_DeletedAt");
+        builder.HasIndex(e => e.Enabled).HasDatabaseName("IX_permissions_Enabled");
 
         // Relationships
         builder
@@ -37,18 +68,5 @@ public class PermissionConfiguration : SpanishEntityConfiguration<Permission, Gu
             .WithMany(tp => tp.Permissions)
             .HasForeignKey(p => p.IdPermissionType)
             .OnDelete(DeleteBehavior.Cascade);
-
-        // Índice único compuesto
-        builder
-            .HasIndex(p => new
-            {
-                p.IdRole,
-                p.IdModule,
-                p.IdPermissionType,
-            })
-            .IsUnique()
-            .HasDatabaseName("IX_Permissions_Unique_Active");
     }
-
-    protected override string GetTableName() => "permisos";
 }

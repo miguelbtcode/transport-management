@@ -5,6 +5,16 @@ public class Role : Aggregate<Guid>
     public string Name { get; private set; } = default!;
     public string Description { get; private set; } = default!;
 
+    // Soft delete
+    public bool Enabled { get; set; }
+
+    // Full audit fields
+    public DateTime CreatedAt { get; set; }
+    public string CreatedBy { get; set; } = default!;
+    public DateTime LastModified { get; set; }
+    public string LastModifiedBy { get; set; } = default!;
+
+    // Navigation properties
     private readonly List<UserRole> _userRoles = [];
     public IReadOnlyList<UserRole> UserRoles => _userRoles.AsReadOnly();
 
@@ -35,10 +45,5 @@ public class Role : Aggregate<Guid>
 
     public void Activate() => Enabled = true;
 
-    public void Deactivate()
-    {
-        Enabled = false;
-        DeletedAt = DateTime.UtcNow;
-        DeletedReason = "Role deleted";
-    }
+    public void Deactivate() => Enabled = false;
 }

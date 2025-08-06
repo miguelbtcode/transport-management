@@ -10,6 +10,8 @@ public class UserRole : Entity<Guid>
     public User User { get; private set; } = default!;
     public Role Role { get; private set; } = default!;
 
+    private UserRole() { }
+
     internal UserRole(Guid idUser, Guid idRole, DateTime dateAssigned)
     {
         IdUser = idUser;
@@ -34,6 +36,4 @@ public class UserRole : Entity<Guid>
 
         return userRole;
     }
-
-    private UserRole() { } // EF Constructor
 }

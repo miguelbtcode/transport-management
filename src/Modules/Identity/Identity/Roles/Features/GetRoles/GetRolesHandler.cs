@@ -127,9 +127,9 @@ internal class GetRolesHandler(IUnitOfWork unitOfWork)
                     assignedUsersCount,
                     modulesCount,
                     permissionsCount,
-                    role.CreatedAt?.ToString("dd/MM/yyyy HH:mm:ss"),
+                    role.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss"),
                     role.CreatedBy,
-                    role.LastModified?.ToString("dd/MM/yyyy HH:mm:ss"),
+                    role.LastModified.ToString("dd/MM/yyyy HH:mm:ss"),
                     role.LastModifiedBy,
                     modulePermissions
                 );

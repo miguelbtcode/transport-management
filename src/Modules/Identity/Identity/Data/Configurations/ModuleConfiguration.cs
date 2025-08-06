@@ -1,19 +1,24 @@
-using Shared.Data.Configurations;
-
 namespace Identity.Data.Configurations;
 
-public class ModuleConfiguration : SpanishEntityConfiguration<Module, Guid>
+public class ModuleConfiguration : IEntityTypeConfiguration<Module>
 {
-    protected override void ConfigureEntity(EntityTypeBuilder<Module> builder)
+    public void Configure(EntityTypeBuilder<Module> builder)
     {
-        // Override primary key column name
-        builder.Property(e => e.Id).HasColumnName("id_modulo");
+        builder.HasKey(e => e.Id);
+        builder.ToTable("modules");
 
-        // Entity-specific properties
-        builder.Property(e => e.Name).IsRequired().HasMaxLength(50).HasColumnName("nombre_modulo");
-        builder.Property(e => e.Description).HasMaxLength(255).HasColumnName("descripcion");
+        // Properties
+        builder.Property(e => e.Name).IsRequired().HasMaxLength(50).HasColumnName("name");
+        builder.Property(e => e.Description).HasMaxLength(255).HasColumnName("description");
+
+        // Soft delete
+        builder
+            .Property(e => e.Enabled)
+            .IsRequired()
+            .HasColumnName("enabled")
+            .HasDefaultValue(true);
+
+        // Relationships
         builder.HasMany(m => m.Permissions).WithOne(p => p.Module).HasForeignKey(p => p.IdModule);
     }
-
-    protected override string GetTableName() => "modulos";
 }

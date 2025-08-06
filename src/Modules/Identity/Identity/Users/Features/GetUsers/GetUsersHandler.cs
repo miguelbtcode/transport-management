@@ -35,7 +35,7 @@ internal class GetUsersHandler(IUnitOfWork unitOfWork)
                 u.Id,
                 u.Name,
                 u.Email,
-                u.CreatedAt!.Value,
+                u.CreatedAt,
                 u.Enabled,
                 u.UserRoles.Select(ur => ur.Role.Name).ToList()
             ))

@@ -42,7 +42,10 @@ public static class IdentityModule
         AddJwtAuthentication(services, configuration);
 
         // Token Cleanup Background Service
-        AddTokenCleanupService(services);
+        AddTokenCleanupBackgroundService(services);
+
+        // General services
+        AddGeneralServices(services);
 
         return services;
     }
@@ -146,9 +149,14 @@ public static class IdentityModule
             });
     }
 
-    private static void AddTokenCleanupService(IServiceCollection services)
+    private static void AddTokenCleanupBackgroundService(IServiceCollection services)
     {
         services.AddHostedService<TokenCleanupService>();
+    }
+
+    private static void AddGeneralServices(IServiceCollection services)
+    {
+        services.AddCurrentUserService();
     }
 
     public static IApplicationBuilder UseIdentityModule(this IApplicationBuilder app)

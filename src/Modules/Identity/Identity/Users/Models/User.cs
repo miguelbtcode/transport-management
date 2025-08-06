@@ -6,6 +6,19 @@ public class User : Aggregate<Guid>
     public string Email { get; private set; } = default!;
     public string Password { get; private set; } = default!;
 
+    // Soft delete
+    public bool Enabled { get; set; }
+
+    // Full audit fields
+    public DateTime CreatedAt { get; set; }
+    public string CreatedBy { get; set; } = default!;
+    public DateTime LastModified { get; set; }
+    public string LastModifiedBy { get; set; } = default!;
+    public DateTime? DeletedAt { get; set; }
+    public string? DeletedBy { get; set; }
+    public string? DeletedReason { get; set; }
+
+    // Navigation properties
     private readonly List<UserRole> _userRoles = [];
     public IReadOnlyList<UserRole> UserRoles => _userRoles.AsReadOnly();
 
@@ -48,14 +61,20 @@ public class User : Aggregate<Guid>
         Password = newHashedPassword;
     }
 
-    public void Activate()
-    {
-        Enabled = true;
-    }
+    public void Activate() => Enabled = true;
 
-    public void Deactivate()
+    public void Deactivate(string reason = "Account deactivated")
     {
         Enabled = false;
+        DeletedAt = DateTime.UtcNow;
+        DeletedReason = reason;
+    }
+
+    public void SuspendAccount(string reason = "Account suspended")
+    {
+        Enabled = false;
+        DeletedAt = DateTime.UtcNow;
+        DeletedReason = reason;
     }
 
     public void AssignRole(Guid roleId)

@@ -1,9 +1,11 @@
 global using System.Reflection;
 global using Carter;
 global using FluentValidation;
+global using Identity.Authentication.Models;
 global using Identity.Authorization.Extensions;
 global using Identity.Data;
 global using Identity.Permissions.Models;
+global using Identity.PermissionTypes.Models;
 global using Identity.Roles.Models;
 global using Identity.Users.Dtos;
 global using Identity.Users.Events;

@@ -1,10 +1,14 @@
 namespace Identity.Modules.Models;
 
-public class Module : Entity<Guid>
+public class Module : Aggregate<Guid>
 {
     public string Name { get; private set; } = default!;
     public string Description { get; private set; } = default!;
 
+    // Soft delete
+    public bool Enabled { get; set; }
+
+    // Navigation properties
     private readonly List<Permission> _permissions = [];
     public IReadOnlyList<Permission> Permissions => _permissions.AsReadOnly();
 
@@ -24,6 +28,7 @@ public class Module : Entity<Guid>
     public void Update(string name, string description)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
         Name = name;
         Description = description ?? string.Empty;
     }

@@ -1,18 +1,21 @@
-using Shared.Data.Configurations;
-
 namespace Identity.Data.Configurations;
 
-public class UserRoleConfiguration : SpanishEntityConfiguration<UserRole, Guid>
+public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 {
-    protected override void ConfigureEntity(EntityTypeBuilder<UserRole> builder)
+    public void Configure(EntityTypeBuilder<UserRole> builder)
     {
-        builder.Property(e => e.Id).HasColumnName("id");
-        builder.Property(e => e.IdUser).IsRequired().HasColumnName("id_usuario");
-        builder.Property(e => e.IdRole).IsRequired().HasColumnName("id_rol");
+        builder.HasKey(e => e.Id);
+        builder.ToTable("user_roles");
+
+        // Properties
+        builder.Property(e => e.IdUser).IsRequired().HasColumnName("user_id");
+        builder.Property(e => e.IdRole).IsRequired().HasColumnName("role_id");
+
+        // Relationships
         builder
             .Property(e => e.DateAssigned)
             .IsRequired()
-            .HasColumnName("fecha_asignacion")
+            .HasColumnName("date_assigned")
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder
@@ -29,6 +32,4 @@ public class UserRoleConfiguration : SpanishEntityConfiguration<UserRole, Guid>
 
         builder.HasIndex(ur => new { ur.IdUser, ur.IdRole }).IsUnique();
     }
-
-    protected override string GetTableName() => "usuarios_roles";
 }

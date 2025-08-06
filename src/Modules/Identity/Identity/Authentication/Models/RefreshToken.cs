@@ -20,7 +20,7 @@ public class RefreshToken : Entity<Guid>
     // Navigation property
     public User User { get; private set; } = default!;
 
-    private RefreshToken() { } // EF Constructor
+    private RefreshToken() { }
 
     public static RefreshToken CreateMobile(
         Guid userId,

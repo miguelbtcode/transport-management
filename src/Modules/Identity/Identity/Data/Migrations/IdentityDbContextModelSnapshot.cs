@@ -27,36 +27,12 @@ namespace Identity.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id_refresh_token");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("AppVersion")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasColumnName("app_version");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_creacion");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("creado_por");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_eliminacion");
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("eliminado_por");
-
-                    b.Property<string>("DeletedReason")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("razon_eliminacion");
 
                     b.Property<string>("DeviceId")
                         .IsRequired()
@@ -69,12 +45,6 @@ namespace Identity.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("device_name");
-
-                    b.Property<bool>("Enabled")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("activo");
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
@@ -90,15 +60,6 @@ namespace Identity.Data.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
                         .HasColumnName("is_revoked");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("modificado_por");
 
                     b.Property<DateTime>("LastUsed")
                         .HasColumnType("timestamp with time zone")
@@ -127,21 +88,12 @@ namespace Identity.Data.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
-                        .HasColumnName("id_usuario");
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedAt")
-                        .HasDatabaseName("IX_refresh_tokens_FechaCreacion");
-
-                    b.HasIndex("DeletedAt")
-                        .HasDatabaseName("IX_refresh_tokens_FechaEliminacion");
-
                     b.HasIndex("DeviceId")
                         .HasDatabaseName("IX_RefreshTokens_DeviceId");
-
-                    b.HasIndex("Enabled")
-                        .HasDatabaseName("IX_refresh_tokens_Activo");
 
                     b.HasIndex("ExpiresAt")
                         .HasDatabaseName("IX_RefreshTokens_ExpiresAt");
@@ -166,146 +118,175 @@ namespace Identity.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id_modulo");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_creacion");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("creado_por");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_eliminacion");
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("eliminado_por");
-
-                    b.Property<string>("DeletedReason")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("razon_eliminacion");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
-                        .HasColumnName("descripcion");
+                        .HasColumnName("description");
 
                     b.Property<bool>("Enabled")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
-                        .HasColumnName("activo");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("modificado_por");
+                        .HasColumnName("enabled");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("nombre_modulo");
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedAt")
-                        .HasDatabaseName("IX_modulos_FechaCreacion");
+                    b.ToTable("modules", "identity");
+                });
 
-                    b.HasIndex("DeletedAt")
-                        .HasDatabaseName("IX_modulos_FechaEliminacion");
+            modelBuilder.Entity("Identity.PermissionTypes.Models.PermissionType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("category");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("created_by");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("Enabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("enabled");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<string>("LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("IX_permission_types_CreatedAt");
 
                     b.HasIndex("Enabled")
-                        .HasDatabaseName("IX_modulos_Activo");
+                        .HasDatabaseName("IX_permission_types_Enabled");
 
-                    b.ToTable("modulos", "identity");
+                    b.ToTable("permission_types", "identity");
                 });
 
             modelBuilder.Entity("Identity.Permissions.Models.Permission", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id_permiso");
+                        .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_creacion");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("creado_por");
+                        .HasColumnName("created_by");
 
                     b.Property<DateTime>("DateAssigned")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_asignacion")
+                        .HasColumnName("assigned_date")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_eliminacion");
+                        .HasColumnName("deleted_at");
 
                     b.Property<string>("DeletedBy")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("eliminado_por");
+                        .HasColumnName("deleted_by");
 
                     b.Property<string>("DeletedReason")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
-                        .HasColumnName("razon_eliminacion");
+                        .HasColumnName("deleted_reason");
 
                     b.Property<bool>("Enabled")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
-                        .HasColumnName("activo");
+                        .HasColumnName("enabled");
 
                     b.Property<Guid>("IdModule")
                         .HasColumnType("uuid")
-                        .HasColumnName("id_modulo");
+                        .HasColumnName("module_id");
 
                     b.Property<Guid>("IdPermissionType")
                         .HasColumnType("uuid")
-                        .HasColumnName("id_tipo_permiso");
+                        .HasColumnName("permission_type_id");
 
                     b.Property<Guid>("IdRole")
                         .HasColumnType("uuid")
-                        .HasColumnName("id_rol");
+                        .HasColumnName("role_id");
 
-                    b.Property<DateTime?>("LastModified")
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_modificacion");
+                        .HasColumnName("last_modified");
 
                     b.Property<string>("LastModifiedBy")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("modificado_por");
+                        .HasColumnName("last_modified_by");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt")
-                        .HasDatabaseName("IX_permisos_FechaCreacion");
+                        .HasDatabaseName("IX_permissions_CreatedAt");
 
                     b.HasIndex("DeletedAt")
-                        .HasDatabaseName("IX_permisos_FechaEliminacion");
+                        .HasDatabaseName("IX_permissions_DeletedAt");
 
                     b.HasIndex("Enabled")
-                        .HasDatabaseName("IX_permisos_Activo");
+                        .HasDatabaseName("IX_permissions_Enabled");
 
                     b.HasIndex("IdModule");
 
@@ -315,93 +296,7 @@ namespace Identity.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Permissions_Unique_Active");
 
-                    b.ToTable("permisos", "identity");
-                });
-
-            modelBuilder.Entity("Identity.Permissions.Models.PermissionType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id_tipo_permiso");
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("categoria");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("codigo");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_creacion");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("creado_por");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_eliminacion");
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("eliminado_por");
-
-                    b.Property<string>("DeletedReason")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("razon_eliminacion");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("descripcion");
-
-                    b.Property<bool>("Enabled")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("activo");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("modificado_por");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("nombre_permiso");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("CreatedAt")
-                        .HasDatabaseName("IX_tipos_permisos_FechaCreacion");
-
-                    b.HasIndex("DeletedAt")
-                        .HasDatabaseName("IX_tipos_permisos_FechaEliminacion");
-
-                    b.HasIndex("Enabled")
-                        .HasDatabaseName("IX_tipos_permisos_Activo");
-
-                    b.ToTable("tipos_permisos", "identity");
+                    b.ToTable("permissions", "identity");
                 });
 
             modelBuilder.Entity("Identity.Roles.Models.Role", b =>
@@ -409,68 +304,53 @@ namespace Identity.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id_rol");
+                        .HasColumnName("id");
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_creacion");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("creado_por");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_eliminacion");
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("eliminado_por");
-
-                    b.Property<string>("DeletedReason")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("razon_eliminacion");
+                        .HasColumnName("created_by");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
-                        .HasColumnName("descripcion");
+                        .HasColumnName("description");
 
                     b.Property<bool>("Enabled")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
-                        .HasColumnName("activo");
+                        .HasColumnName("enabled");
 
-                    b.Property<DateTime?>("LastModified")
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_modificacion");
+                        .HasColumnName("last_modified");
 
                     b.Property<string>("LastModifiedBy")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("modificado_por");
+                        .HasColumnName("last_modified_by");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("nombre_rol");
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt")
-                        .HasDatabaseName("IX_roles_FechaCreacion");
-
-                    b.HasIndex("DeletedAt")
-                        .HasDatabaseName("IX_roles_FechaEliminacion");
+                        .HasDatabaseName("IX_roles_CreatedAt");
 
                     b.HasIndex("Enabled")
-                        .HasDatabaseName("IX_roles_Activo");
+                        .HasDatabaseName("IX_roles_Enabled");
 
                     b.ToTable("roles", "identity");
                 });
@@ -480,30 +360,31 @@ namespace Identity.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id_usuario");
+                        .HasColumnName("id");
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_creacion");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("creado_por");
+                        .HasColumnName("created_by");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_eliminacion");
+                        .HasColumnName("deleted_at");
 
                     b.Property<string>("DeletedBy")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("eliminado_por");
+                        .HasColumnName("deleted_by");
 
                     b.Property<string>("DeletedReason")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
-                        .HasColumnName("razon_eliminacion");
+                        .HasColumnName("deleted_reason");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -515,22 +396,23 @@ namespace Identity.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
-                        .HasColumnName("activo");
+                        .HasColumnName("enabled");
 
-                    b.Property<DateTime?>("LastModified")
+                    b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_modificacion");
+                        .HasColumnName("last_modified");
 
                     b.Property<string>("LastModifiedBy")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("modificado_por");
+                        .HasColumnName("last_modified_by");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("nombre");
+                        .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -541,96 +423,48 @@ namespace Identity.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt")
-                        .HasDatabaseName("IX_usuarios_FechaCreacion");
+                        .HasDatabaseName("IX_users_CreatedAt");
 
                     b.HasIndex("DeletedAt")
-                        .HasDatabaseName("IX_usuarios_FechaEliminacion");
+                        .HasDatabaseName("IX_users_DeletedAt");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.HasIndex("Enabled")
-                        .HasDatabaseName("IX_usuarios_Activo");
+                        .HasDatabaseName("IX_users_Enabled");
 
-                    b.ToTable("usuarios", "identity");
+                    b.ToTable("users", "identity");
                 });
 
             modelBuilder.Entity("Identity.Users.Models.UserRole", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_creacion");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("creado_por");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("DateAssigned")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_asignacion")
+                        .HasColumnName("date_assigned")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_eliminacion");
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("eliminado_por");
-
-                    b.Property<string>("DeletedReason")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("razon_eliminacion");
-
-                    b.Property<bool>("Enabled")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("activo");
 
                     b.Property<Guid>("IdRole")
                         .HasColumnType("uuid")
-                        .HasColumnName("id_rol");
+                        .HasColumnName("role_id");
 
                     b.Property<Guid>("IdUser")
                         .HasColumnType("uuid")
-                        .HasColumnName("id_usuario");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("fecha_modificacion");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("modificado_por");
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedAt")
-                        .HasDatabaseName("IX_usuarios_roles_FechaCreacion");
-
-                    b.HasIndex("DeletedAt")
-                        .HasDatabaseName("IX_usuarios_roles_FechaEliminacion");
-
-                    b.HasIndex("Enabled")
-                        .HasDatabaseName("IX_usuarios_roles_Activo");
 
                     b.HasIndex("IdRole");
 
                     b.HasIndex("IdUser", "IdRole")
                         .IsUnique();
 
-                    b.ToTable("usuarios_roles", "identity");
+                    b.ToTable("user_roles", "identity");
                 });
 
             modelBuilder.Entity("Identity.Authentication.Models.RefreshToken", b =>
@@ -652,7 +486,7 @@ namespace Identity.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Identity.Permissions.Models.PermissionType", "PermissionType")
+                    b.HasOne("Identity.PermissionTypes.Models.PermissionType", "PermissionType")
                         .WithMany("Permissions")
                         .HasForeignKey("IdPermissionType")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -695,7 +529,7 @@ namespace Identity.Data.Migrations
                     b.Navigation("Permissions");
                 });
 
-            modelBuilder.Entity("Identity.Permissions.Models.PermissionType", b =>
+            modelBuilder.Entity("Identity.PermissionTypes.Models.PermissionType", b =>
                 {
                     b.Navigation("Permissions");
                 });

@@ -1,16 +1,15 @@
-using Identity.Authentication.Models;
-using Shared.Data.Configurations;
-
 namespace Identity.Data.Configurations;
 
-public class RefreshTokenConfiguration : SpanishEntityConfiguration<RefreshToken, Guid>
+public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {
-    protected override void ConfigureEntity(EntityTypeBuilder<RefreshToken> builder)
+    public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
-        builder.Property(e => e.Id).HasColumnName("id_refresh_token");
+        builder.HasKey(e => e.Id);
+        builder.ToTable("refresh_tokens");
 
+        // Properties
         builder.Property(e => e.Token).IsRequired().HasMaxLength(500).HasColumnName("token");
-        builder.Property(e => e.UserId).IsRequired().HasColumnName("id_usuario");
+        builder.Property(e => e.UserId).IsRequired().HasColumnName("user_id");
         builder.Property(e => e.DeviceId).IsRequired().HasMaxLength(100).HasColumnName("device_id");
         builder
             .Property(e => e.DeviceName)
@@ -30,7 +29,7 @@ public class RefreshTokenConfiguration : SpanishEntityConfiguration<RefreshToken
             .HasDefaultValue(false);
         builder.Property(e => e.RevokedReason).HasMaxLength(255).HasColumnName("revoked_reason");
 
-        // Índices específicos
+        // Properties indexes
         builder.HasIndex(e => e.Token).IsUnique().HasDatabaseName("IX_RefreshTokens_Token");
         builder.HasIndex(e => e.UserId).HasDatabaseName("IX_RefreshTokens_UserId");
         builder.HasIndex(e => e.DeviceId).HasDatabaseName("IX_RefreshTokens_DeviceId");
@@ -40,13 +39,11 @@ public class RefreshTokenConfiguration : SpanishEntityConfiguration<RefreshToken
             .HasIndex(e => new { e.UserId, e.DeviceId })
             .HasDatabaseName("IX_RefreshTokens_UserId_DeviceId");
 
-        // Relaciones
+        // Relationships
         builder
             .HasOne(rt => rt.User)
             .WithMany()
             .HasForeignKey(rt => rt.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
-
-    protected override string GetTableName() => "refresh_tokens";
 }

@@ -1,5 +1,3 @@
-using Identity.PermissionTypes.Models;
-
 namespace Identity.Permissions.Models;
 
 public class Permission : Entity<Guid>
@@ -8,6 +6,18 @@ public class Permission : Entity<Guid>
     public Guid IdModule { get; private set; }
     public Guid IdPermissionType { get; private set; }
     public DateTime DateAssigned { get; private set; }
+
+    // Soft delete
+    public bool Enabled { get; set; }
+
+    // Full audit fields
+    public DateTime CreatedAt { get; set; }
+    public string CreatedBy { get; set; } = default!;
+    public DateTime LastModified { get; set; }
+    public string LastModifiedBy { get; set; } = default!;
+    public DateTime? DeletedAt { get; set; }
+    public string? DeletedBy { get; set; }
+    public string? DeletedReason { get; set; }
 
     // Navigation properties
     public Role Role { get; private set; } = default!;

@@ -2,11 +2,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Shared.Contracts.DDD;
+using Shared.Contracts.Services;
 
 namespace Shared.Data.Interceptors;
 
-public class AuditableEntityInterceptor : SaveChangesInterceptor
+public class AuditableEntityInterceptor(ICurrentUserService currentUserService)
+    : SaveChangesInterceptor
 {
+    private readonly ICurrentUserService _currentUserService = currentUserService;
+
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
         InterceptionResult<int> result
@@ -26,41 +30,73 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private static void UpdateEntities(DbContext? context)
+    private void UpdateEntities(DbContext? context)
     {
         if (context == null)
             return;
 
+        var currentUser = _currentUserService.GetCurrentUserEmail() ?? "system";
+        var utcNow = DateTime.UtcNow;
+
         foreach (var entry in context.ChangeTracker.Entries<IEntity>())
         {
-            if (entry.State == EntityState.Added)
+            switch (entry.State)
             {
-                entry.Entity.CreatedBy = "admin";
-                entry.Entity.CreatedAt = DateTime.UtcNow;
-            }
-
-            if (
-                entry.State == EntityState.Added
-                || entry.State == EntityState.Modified
-                || entry.HasChangedOwnedEntities()
-            )
-            {
-                entry.Entity.LastModifiedBy = "admin";
-                entry.Entity.LastModified = DateTime.UtcNow;
+                case EntityState.Added:
+                    HandleEntityAdded(entry, currentUser, utcNow);
+                    break;
+                case EntityState.Modified:
+                    HandleEntityModified(entry, currentUser, utcNow);
+                    break;
             }
         }
     }
-}
 
-public static class Extensions
-{
-    public static bool HasChangedOwnedEntities(this EntityEntry entry) =>
-        entry.References.Any(r =>
-            r.TargetEntry != null
-            && r.TargetEntry.Metadata.IsOwned()
-            && (
-                r.TargetEntry.State == EntityState.Added
-                || r.TargetEntry.State == EntityState.Modified
-            )
-        );
+    private static void HandleEntityAdded(EntityEntry entry, string currentUser, DateTime utcNow)
+    {
+        var entity = entry.Entity;
+        var entityType = entity.GetType();
+
+        SetPropertyIfExists(entityType, entity, "CreatedAt", utcNow);
+        SetPropertyIfExists(entityType, entity, "CreatedBy", currentUser);
+        SetPropertyIfExists(entityType, entity, "LastModified", utcNow);
+        SetPropertyIfExists(entityType, entity, "LastModifiedBy", currentUser);
+    }
+
+    private static void HandleEntityModified(EntityEntry entry, string currentUser, DateTime utcNow)
+    {
+        var entity = entry.Entity;
+        var entityType = entity.GetType();
+
+        SetPropertyIfExists(entityType, entity, "LastModified", utcNow);
+        SetPropertyIfExists(entityType, entity, "LastModifiedBy", currentUser);
+    }
+
+    private static void SetPropertyIfExists(
+        Type entityType,
+        object entity,
+        string propertyName,
+        object value
+    )
+    {
+        var property = entityType.GetProperty(propertyName);
+        if (property != null && property.CanWrite)
+        {
+            if (IsTypeCompatible(property.PropertyType, value?.GetType()))
+            {
+                property.SetValue(entity, value);
+            }
+        }
+    }
+
+    private static bool IsTypeCompatible(Type propertyType, Type? valueType)
+    {
+        if (valueType == null)
+            return !propertyType.IsValueType || Nullable.GetUnderlyingType(propertyType) != null;
+        return propertyType.IsAssignableFrom(valueType)
+            || (
+                Nullable.GetUnderlyingType(propertyType) != null
+                && Nullable.GetUnderlyingType(propertyType)!.IsAssignableFrom(valueType)
+            );
+    }
 }
