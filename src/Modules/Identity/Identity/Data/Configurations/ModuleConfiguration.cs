@@ -8,6 +8,7 @@ public class ModuleConfiguration : IEntityTypeConfiguration<Module>
         builder.ToTable("modules");
 
         // Properties
+        builder.Property(e => e.Id).HasColumnName("id");
         builder.Property(e => e.Name).IsRequired().HasMaxLength(50).HasColumnName("name");
         builder.Property(e => e.Description).HasMaxLength(255).HasColumnName("description");
 

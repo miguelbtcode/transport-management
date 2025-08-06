@@ -8,6 +8,7 @@ public class PermissionTypeConfiguration : IEntityTypeConfiguration<PermissionTy
         builder.ToTable("permission_types");
 
         // Properties
+        builder.Property(e => e.Id).HasColumnName("id");
         builder.Property(e => e.Name).IsRequired().HasMaxLength(30).HasColumnName("name");
         builder.Property(e => e.Code).IsRequired().HasMaxLength(20).HasColumnName("code");
         builder.Property(e => e.Category).IsRequired().HasMaxLength(20).HasColumnName("category");

@@ -9,6 +9,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
         builder.ToTable("permissions");
 
         // Properties
+        builder.Property(e => e.Id).HasColumnName("id");
         builder.Property(e => e.IdRole).IsRequired().HasColumnName("role_id");
         builder.Property(e => e.IdModule).IsRequired().HasColumnName("module_id");
         builder.Property(e => e.IdPermissionType).IsRequired().HasColumnName("permission_type_id");

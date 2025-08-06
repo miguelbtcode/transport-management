@@ -18,7 +18,7 @@ namespace Identity.Data.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(
                         type: "character varying(50)",
                         maxLength: 50,
@@ -37,7 +37,7 @@ namespace Identity.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_modules", x => x.Id);
+                    table.PrimaryKey("PK_modules", x => x.id);
                 }
             );
 
@@ -46,7 +46,7 @@ namespace Identity.Data.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(
                         type: "character varying(30)",
                         maxLength: 30,
@@ -93,7 +93,7 @@ namespace Identity.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_permission_types", x => x.Id);
+                    table.PrimaryKey("PK_permission_types", x => x.id);
                 }
             );
 
@@ -213,7 +213,7 @@ namespace Identity.Data.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     role_id = table.Column<Guid>(type: "uuid", nullable: false),
                     module_id = table.Column<Guid>(type: "uuid", nullable: false),
                     permission_type_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -262,13 +262,13 @@ namespace Identity.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_permissions", x => x.Id);
+                    table.PrimaryKey("PK_permissions", x => x.id);
                     table.ForeignKey(
                         name: "FK_permissions_modules_module_id",
                         column: x => x.module_id,
                         principalSchema: "identity",
                         principalTable: "modules",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade
                     );
                     table.ForeignKey(
@@ -276,7 +276,7 @@ namespace Identity.Data.Migrations
                         column: x => x.permission_type_id,
                         principalSchema: "identity",
                         principalTable: "permission_types",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade
                     );
                     table.ForeignKey(
@@ -295,7 +295,7 @@ namespace Identity.Data.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     token = table.Column<string>(
                         type: "character varying(500)",
                         maxLength: 500,
@@ -349,7 +349,7 @@ namespace Identity.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_refresh_tokens", x => x.Id);
+                    table.PrimaryKey("PK_refresh_tokens", x => x.id);
                     table.ForeignKey(
                         name: "FK_refresh_tokens_users_user_id",
                         column: x => x.user_id,
@@ -366,7 +366,7 @@ namespace Identity.Data.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     role_id = table.Column<Guid>(type: "uuid", nullable: false),
                     date_assigned = table.Column<DateTime>(
@@ -377,7 +377,7 @@ namespace Identity.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_user_roles", x => x.Id);
+                    table.PrimaryKey("PK_user_roles", x => x.id);
                     table.ForeignKey(
                         name: "FK_user_roles_roles_role_id",
                         column: x => x.role_id,

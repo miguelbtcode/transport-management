@@ -8,6 +8,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.ToTable("refresh_tokens");
 
         // Properties
+        builder.Property(e => e.Id).HasColumnName("id");
         builder.Property(e => e.Token).IsRequired().HasMaxLength(500).HasColumnName("token");
         builder.Property(e => e.UserId).IsRequired().HasColumnName("user_id");
         builder.Property(e => e.DeviceId).IsRequired().HasMaxLength(100).HasColumnName("device_id");

@@ -8,6 +8,7 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
         builder.ToTable("user_roles");
 
         // Properties
+        builder.Property(e => e.Id).HasColumnName("id");
         builder.Property(e => e.IdUser).IsRequired().HasColumnName("user_id");
         builder.Property(e => e.IdRole).IsRequired().HasColumnName("role_id");
 
