@@ -27,7 +27,7 @@ output "acr_name" {
 
 output "container_app_url" {
   description = "URL of the container app"
-  value       = "https://${azurerm_container_app.api.latest_revision_fqdn}"
+  value       = "https://${azurerm_container_app.api.ingress[0].fqdn}"
 }
 
 output "container_app_name" {

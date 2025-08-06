@@ -23,7 +23,19 @@ public static class DataExtensions
         using var scope = serviceProvider.CreateScope();
 
         var context = scope.ServiceProvider.GetRequiredService<TContext>();
-        await context.Database.MigrateAsync();
+        try
+        {
+            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
+            {
+                await context.Database.MigrateAsync();
+            }
+        }
+        catch (Exception ex) when (ex.Message.Contains("already exists"))
+        {
+            // Log the warning but don't fail the application
+            Console.WriteLine($"Warning: Migration skipped - {ex.Message}");
+        }
     }
 
     private static async Task SeedDataAsync(IServiceProvider serviceProvider)
