@@ -1,8 +1,9 @@
-using Shared.Pagination;
+using Identity.Roles.Dtos;
 
 namespace Identity.Users.Features.GetUsers;
 
-public record GetUsersQuery(PaginationRequest PaginationRequest) : IQuery<GetUsersResult>;
+public record GetUsersQuery(PaginationRequest PaginationRequest, bool? Enabled = null)
+    : IQuery<GetUsersResult>;
 
 public record GetUsersResult(PaginatedResult<UserDto> Users);
 
@@ -21,10 +22,16 @@ internal class GetUsersHandler(IUnitOfWork unitOfWork)
 
         var totalCount = await userRepository.CountAsync(cancellationToken: cancellationToken);
 
-        var users = await userRepository
-            .Query(asNoTracking: true)
-            .Include(u => u.UserRoles)
-            .ThenInclude(ur => ur.Role)
+        var usersQuery = userRepository.Query(asNoTracking: true);
+
+        // Apply filters
+        if (query.Enabled.HasValue)
+            usersQuery = usersQuery.Where(u => u.Enabled == query.Enabled.Value);
+
+        // Apply includes
+        usersQuery = usersQuery.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
+
+        var users = await usersQuery
             .OrderBy(u => u.Name)
             .Skip(pageSize * pageIndex)
             .Take(pageSize)
@@ -37,7 +44,13 @@ internal class GetUsersHandler(IUnitOfWork unitOfWork)
                 u.Email,
                 u.CreatedAt,
                 u.Enabled,
-                u.UserRoles.Select(ur => ur.Role.Name).ToList()
+                u.UserRoles.Select(ur => new RoleDto(
+                        ur.Role.Id,
+                        ur.Role.Name,
+                        ur.Role.Description,
+                        ur.Role.Enabled
+                    ))
+                    .ToList()
             ))
             .ToList();
 

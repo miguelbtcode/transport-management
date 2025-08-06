@@ -7,7 +7,7 @@ public class DeleteUserEndpoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapDelete(
-                "/identity/users/{id:int}",
+                "/identity/users/{id:guid}",
                 async (Guid id, ISender sender) =>
                 {
                     var command = new DeleteUserCommand(id);

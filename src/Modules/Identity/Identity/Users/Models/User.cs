@@ -61,7 +61,12 @@ public class User : Aggregate<Guid>
         Password = newHashedPassword;
     }
 
-    public void Activate() => Enabled = true;
+    public void Activate()
+    {
+        Enabled = true;
+        DeletedAt = null;
+        DeletedReason = null;
+    }
 
     public void Deactivate(string reason = "Account deactivated")
     {

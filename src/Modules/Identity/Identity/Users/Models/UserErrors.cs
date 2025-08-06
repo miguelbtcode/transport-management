@@ -16,4 +16,9 @@ public static class UserErrors
 
     public static Error InvalidCurrentPassword =>
         new("User.InvalidCurrentPassword", "La contraseña actual es incorrecta");
+    public static Error AlreadyActive =>
+        new("User.AlreadyActive", "El usuario ya se encuentra activo");
+
+    public static Error AlreadyInactive =>
+        new("User.AlreadyInactive", "El usuario ya se encuentra inactivo");
 }

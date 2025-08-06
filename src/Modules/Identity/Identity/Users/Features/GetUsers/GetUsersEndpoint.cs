@@ -10,9 +10,9 @@ public class GetUsersEndpoint : ICarterModule
     {
         app.MapGet(
                 "/identity/users",
-                async ([AsParameters] PaginationRequest request, ISender sender) =>
+                async ([AsParameters] PaginationRequest request, bool? enabled, ISender sender) =>
                 {
-                    var result = await sender.SendAsync(new GetUsersQuery(request));
+                    var result = await sender.SendAsync(new GetUsersQuery(request, enabled));
                     var response = new GetUsersResponse(result.Users);
 
                     return Results.Ok(response);

@@ -1,5 +1,3 @@
-using Identity.Authentication.Services;
-
 namespace Identity.Users.Features.CreateUser;
 
 public record CreateUserCommand(CreateUserDto User) : ICommand<Result<CreateUserResult>>;
@@ -27,7 +25,6 @@ internal class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordHasher passwor
     {
         var userRepository = unitOfWork.Repository<User>();
 
-        // Verificar si el email ya existe (solo lectura)
         var existingUser = await userRepository.FirstOrDefaultAsync(
             u => u.Email == command.User.Email.ToLower(),
             asNoTracking: true,
@@ -37,11 +34,9 @@ internal class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordHasher passwor
         if (existingUser != null)
             return UserErrors.EmailAlreadyExists(command.User.Email);
 
-        // Ejecutar en transacción
         var userId = await unitOfWork.ExecuteInTransactionAsync(
             async () =>
             {
-                // Crear usuario
                 var hashedPassword = passwordHasher.HashPassword(command.User.Password);
                 var usuario = User.Create(
                     command.User.Name,
@@ -50,11 +45,8 @@ internal class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordHasher passwor
                     command.User.Enabled
                 );
 
-                // Asignar roles
                 foreach (var roleId in command.User.RoleIds)
-                {
                     usuario.AssignRole(roleId);
-                }
 
                 await userRepository.AddAsync(usuario, cancellationToken);
                 return usuario.Id;

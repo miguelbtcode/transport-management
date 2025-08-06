@@ -31,6 +31,9 @@ internal class DeleteUserHandler(IUnitOfWork unitOfWork)
         if (usuario == null)
             return UserErrors.NotFound(command.UserId);
 
+        if (!usuario.Enabled)
+            return UserErrors.AlreadyInactive;
+
         // Soft delete - desactivar usuario
         usuario.Deactivate();
 

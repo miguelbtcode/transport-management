@@ -13,7 +13,7 @@ public static class ValidationExtensions
         params Assembly[] assemblies
     )
     {
-        // Add validatiors
+        // Add validators
         services.AddValidatorsFromAssemblies(assemblies);
 
         // Add decorators

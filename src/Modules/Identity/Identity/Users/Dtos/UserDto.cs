@@ -1,3 +1,5 @@
+using Identity.Roles.Dtos;
+
 namespace Identity.Users.Dtos;
 
 public record UserDto(
@@ -6,5 +8,5 @@ public record UserDto(
     string Email,
     DateTime CreatedAt,
     bool Enabled,
-    List<string> Roles
+    List<RoleDto> Roles
 );

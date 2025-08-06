@@ -29,7 +29,13 @@ internal class GetUserByIdHandler(IUnitOfWork unitOfWork)
             user.Email,
             user.CreatedAt,
             user.Enabled,
-            user.UserRoles.Select(ur => ur.Role.Name).ToList()
+            user.UserRoles.Select(ur => new RoleDto(
+                    ur.Role.Id,
+                    ur.Role.Name,
+                    ur.Role.Description,
+                    ur.Role.Enabled
+                ))
+                .ToList()
         );
 
         return new GetUserByIdResult(userDto);
