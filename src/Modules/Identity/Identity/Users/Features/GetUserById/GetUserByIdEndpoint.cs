@@ -7,7 +7,7 @@ public class GetUserByIdEndpoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet(
-                "/identity/users/{id:int}",
+                "/identity/users/{id:guid}",
                 async (Guid id, ISender sender) =>
                 {
                     var result = await sender.SendAsync(new GetUserByIdQuery(id));

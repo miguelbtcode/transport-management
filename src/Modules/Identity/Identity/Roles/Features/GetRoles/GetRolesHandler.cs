@@ -45,7 +45,7 @@ internal class GetRolesHandler(IUnitOfWork unitOfWork)
         var permissionRepository = unitOfWork.Repository<Permission>();
 
         // 2. Get total roles
-        var totalRoles = await roleRepository.CountAsync(r => r.Enabled, cancellationToken);
+        var totalRoles = await roleRepository.CountAsync(cancellationToken: cancellationToken);
 
         // 3. Get total assigned users
         var totalAssignedUsers = await userRoleRepository
@@ -75,7 +75,7 @@ internal class GetRolesHandler(IUnitOfWork unitOfWork)
 
         // 7. Get roles with details
         var rolesData = await roleRepository
-            .Query(r => r.Enabled, asNoTracking: true)
+            .Query(asNoTracking: true)
             .Include(r => r.UserRoles)
             .Include(r => r.Permissions)
             .ThenInclude(p => p.Module)
@@ -94,7 +94,7 @@ internal class GetRolesHandler(IUnitOfWork unitOfWork)
                 // 8.2. Get module count available
                 var modulePermissions = role
                     .Permissions.Where(p => p.Module.Enabled)
-                    .GroupBy(p => p.Module)
+                    .GroupBy(p => new { p.Module.Id, p.Module.Name, p.Module.Description, p.Module.Enabled })
                     .Select(moduleGroup => new ModuleWithPermissionsDto(
                         new ModuleDto(
                             moduleGroup.Key.Id,
@@ -110,6 +110,7 @@ internal class GetRolesHandler(IUnitOfWork unitOfWork)
                                 p.PermissionType.Category,
                                 p.PermissionType.Description
                             ))
+                            .Distinct()
                             .OrderBy(pt => pt.Name)
                             .ToList()
                     ))
